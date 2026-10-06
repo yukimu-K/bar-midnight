@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Midnight Lounge</title>
+  <style>
+    body { font-family: sans-serif; background: #1a1a2e; color: #fff; padding: 20px; }
+    h1 { text-align: center; color: #e94560; }
+    input { width: 100%; padding: 10px; margin-bottom: 20px; box-sizing: border-box; border-radius: 5px; border: none; font-size: 16px; }
+    .card { background: #16213e; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid #0f3460; }
+    .card h3 { margin: 0 0 5px 0; color: #e94560; }
+    .tag { display: inline-block; background: #0f3460; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin-right: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Midnight Lounge</h1>
+  <input type="text" id="searchInput" placeholder="カクテル名やベースで検索..." oninput="searchCocktails()">
+
+  <div id="cocktailList"></div>
+
+  <script>
+    let cocktails = [];
+
+    fetch('cocktails.json')
+      .then(response => response.json())
+      .then(data => {
+        cocktails = data;
+        displayCocktails(cocktails);
+      });
+
+    function displayCocktails(items) {
+      const listContainer = document.getElementById('cocktailList');
+      listContainer.innerHTML = '';
+      
+      if (items.length === 0) {
+        listContainer.innerHTML = '<p>該当するカクテルが見つかりませんでした。</p>';
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h3>${item.name}</h3>
+          <div>
+            <span class="tag">ベース: ${item.base}</span>
+            <span class="tag">味: ${item.taste}</span>
+          </div>
+          <p>${item.description}</p>
+        `;
+        listContainer.appendChild(card);
+      });
+    }
+
+    function searchCocktails() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = cocktails.filter(c => 
+        c.name.toLowerCase().includes(query) || 
+        c.base.toLowerCase().includes(query) ||
+        c.taste.toLowerCase().includes(query)
+      );
+      displayCocktails(filtered);
+    }
+  </script>
+</body>
+</html>
